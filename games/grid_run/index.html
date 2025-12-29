@@ -4,129 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRID_RUN // FRINK INDUSTRIES</title>
-    <link rel="stylesheet" href="../../style.css">
-    <link rel="stylesheet" href="grid_run.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ff3333%22/></svg>">
-    
-    <!-- Three.js Import Map for ES6 Modules -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
-        }
-    }
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Three.js from CDN for the viewport -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-<body class="grid-run-page">
-    <div class="scanlines"></div>
-    <div class="overlay"></div>
-    <div class="static-noise"></div>
+<body>
+    <div id="game-container">
+        <!-- 3D Viewport (Top 40%) -->
+        <div id="viewport"></div>
 
-    <div class="terminal grid-run-terminal">
-        <!-- BOOT SCREEN (shown before game starts) -->
-        <div id="boot-screen" class="boot-screen">
-            <header class="game-header">
-                <div class="header-glitch">
-                    <h1 class="glitch game-title" data-text="GRID_RUN">GRID_RUN</h1>
-                    <div class="subtitle">[ TEMPORAL NAVIGATION SIMULATOR ]</div>
+        <!-- Terminal Interface (Bottom 60%) -->
+        <div id="terminal">
+            <div id="hud-bar">
+                <div id="hud-status">
+                    <span class="hud-party">
+                        <!-- Populated by JS -->
+                    </span>
+                    <span class="hud-resources">Initialize...</span>
                 </div>
-                <div class="version-info">
-                    <span class="dim">VER:</span> <span class="blink">0.1.ALPHA</span>
-                    <span class="dim">BUILD:</span> 1985.RESTORED
-                </div>
-            </header>
-
-            <main class="boot-content">
-                <div class="ascii-banner">
-╔══════════════════════════════════════════════════════════════════════════════╗
-║  ▄▄▄▄▄▄  ▄▄▄▄▄▄  ▄▄▄▄▄▄  ▄▄▄▄▄▄     ▄▄▄▄▄▄  ▄     ▄  ▄▄    ▄                 ║
-║  █       █    █    █     █     █    █    █  █     █  █ █   █                 ║
-║  █   ▄▄▄ █▄▄▄▄▀    █     █     █    █▄▄▄▄▀  █     █  █  █  █                 ║
-║  █    █  █  █      █     █     █    █  █    █     █  █   █ █                 ║
-║  █▄▄▄▄█  █   █   ▄▄█▄▄   █▄▄▄▄▄█    █   █   █▄▄▄▄▄█  █    ██                 ║
-║                                                                              ║
-║  >> TRAVERSE THE HISTORY OF THE NET. SURVIVE THE JOURNEY. REACH THE SOURCE. ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-                </div>
-
-                <div class="boot-text">
-                    <p class="warning">>> WARNING: TEMPORAL INSTABILITY DETECTED</p>
-                    <p>This simulation reconstructs the early internet from corrupted archives.</p>
-                    <p>You will navigate through eras of digital history—from the copper cables of ARPANET to the browser wars of the 90s.</p>
-                    <p class="dim">Manage your <span class="stat-highlight">INTEGRITY</span> (system health) and <span class="stat-highlight">BANDWIDTH</span> (movement fuel).</p>
-                    <p class="dim">If either reaches zero, your construct will de-rez.</p>
-                </div>
-
-                <div class="boot-menu">
-                    <div class="menu-section">
-                        <span class="prompt">>> SELECT_OPTION:</span>
-                    </div>
-                    <button id="btn-new-game" class="boot-btn">[1] JACK IN (New Game)</button>
-                    <button id="btn-continue" class="boot-btn" disabled>[2] RESUME SIGNAL (Continue)</button>
-                    <button id="btn-about" class="boot-btn">[3] ABOUT // CREDITS</button>
-                    <a href="../../index.html" class="boot-btn back-link">[0] &lt;&lt; RETURN TO FRINK INDUSTRIES</a>
-                </div>
-
-                <div class="lore-quote">
-                    <span class="dim">"The Grid remembers everything. Even you."</span>
-                    <span class="author">— Malcolm Frink, 2025</span>
-                </div>
-            </main>
-
-            <footer class="boot-footer">
-                <div class="footer-border">════════════════════════════════════════</div>
-                <div class="footer-info">
-                    <span>FRINK INDUSTRIES // STRAYLIGHT NODE</span>
-                    <span class="dim">SIGNAL: <span class="blink">UNSTABLE</span></span>
-                </div>
-            </footer>
-        </div>
-
-        <!-- ABOUT SCREEN -->
-        <div id="about-screen" class="about-screen hidden">
-            <header class="game-header">
-                <h1 class="glitch" data-text="ABOUT">ABOUT</h1>
-            </header>
-            <main class="about-content">
-                <div class="about-section">
-                    <h2>// WHAT IS GRID_RUN?</h2>
-                    <p>Grid Run is an Oregon Trail-style text adventure set in the history of the internet.</p>
-                    <p>Navigate through digital eras, manage your resources, and learn the lore of cyberspace.</p>
-                </div>
-                <div class="about-section">
-                    <h2>// CREDITS</h2>
-                    <p>DESIGN & CODE: <a href="https://sid3.xyz" class="link-safe">SID3.XYZ</a></p>
-                    <p>CHARACTER: MALCOLM FRINK (Superhuman Samurai Syber-Squad)</p>
-                    <p>INSPIRED BY: The Oregon Trail (MECC, 1985)</p>
-                    <p>PROJECT: <a href="https://straylightecho.com" class="link-safe">STRAYLIGHT ECHO</a></p>
-                </div>
-                <div class="about-section">
-                    <h2>// STATUS</h2>
-                    <p class="warning">PROTOTYPE BUILD — Zone 1 only.</p>
-                    <p class="dim">More zones, events, and lore coming soon.</p>
-                </div>
-                <button id="btn-back-about" class="boot-btn">[0] &lt;&lt; BACK</button>
-            </main>
-        </div>
-
-        <!-- GAME SCREEN (with 3D viewport + terminal) -->
-        <div id="game-screen" class="game-screen hidden">
-            <!-- 3D Viewport (The Grid) -->
-            <div id="viewport-container" class="viewport-container">
-                <!-- Three.js canvas will be injected here -->
-                <div class="viewport-loading">
-                    <span class="loading-text">INITIALIZING GRID...</span>
-                </div>
+                <div class="hud-credits">$0</div>
             </div>
-            
-            <!-- Terminal Area (text output/input) -->
-            <div id="terminal-container" class="terminal-container">
-                <!-- HUD and Terminal will be injected here by JS -->
+
+            <div id="content">
+                <!-- Game text content goes here -->
+            </div>
+
+            <div id="choices">
+                <!-- Choice buttons go here -->
+            </div>
+
+            <div id="input-line">
+                <span id="prompt">></span>
+                <input type="text" id="text-input" autocomplete="off" spellcheck="false" autofocus>
             </div>
         </div>
     </div>
 
-    <script type="module" src="boot.js"></script>
+    <!-- Scanline effects -->
+    <div class="scanlines"></div>
+    <div class="static-noise"></div>
+
+    <!-- Back to Main Site -->
+    <a href="/" class="back-link">[<< RETURN TO ROOT]</a>
+
+    <!-- Initialize Module System -->
+    <script type="module" src="src/main.js"></script>
 </body>
 </html>

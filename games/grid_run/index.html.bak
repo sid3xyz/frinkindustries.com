@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRID_RUN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #33ff33;
+            --green-dim: #116611;
+            --green-glow: #00ff00;
+            --cyan: #00ffff;
+            --magenta: #ff00ff;
+            --amber: #ffaa00;
+            --bg: #0a0a0a;
+            --bg-panel: #050808;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--green);
+            font-family: 'VT323', 'Courier New', monospace;
+            overflow: hidden;
+        }
+
+        /* CRT Monitor Effect Container */
+        .crt {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Scanline overlay */
+        .crt::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Screen glow */
+        .crt::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.3) 90%,
+                rgba(0, 0, 0, 0.6) 100%
+            );
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* Main terminal frame */
+        .terminal {
+            width: 100%;
+            max-width: 720px;
+            height: 90vh;
+            max-height: 640px;
+            background: var(--bg-panel);
+            border: 3px solid var(--green-dim);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 0, 0.1),
+                inset 0 0 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Terminal header bar */
+        .terminal-header {
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+            border-bottom: 2px solid var(--green-dim);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--green-dim);
+        }
+
+        .terminal-header .left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-header .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--green-dim);
+        }
+
+        .terminal-header .dot.active {
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green-glow);
+        }
+
+        .terminal-header .title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Main content area */
+        .terminal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 32px;
+            overflow: hidden;
+        }
+
+        /* ASCII Art Display */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            line-height: 1.1;
+            white-space: pre;
+            color: var(--green);
+            text-shadow: 0 0 10px var(--green-glow);
+            letter-spacing: 0;
+        }
+
+        .subtitle {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: var(--green-dim);
+            margin-top: 8px;
+            letter-spacing: 4px;
+        }
+
+        /* Divider line */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--green-dim);
+            margin: 20px 0;
+            opacity: 0.5;
+        }
+
+        /* Quote section */
+        .quote-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .quote {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--green);
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+
+        .quote::before {
+            content: '"';
+            color: var(--green-dim);
+        }
+
+        .quote::after {
+            content: '"';
+            color: var(--green-dim);
+        }
+
+        .attribution {
+            text-align: right;
+            font-size: 16px;
+            color: var(--magenta);
+        }
+
+        /* Menu section */
+        .menu-section {
+            border-top: 1px solid var(--green-dim);
+            padding-top: 20px;
+            margin-top: auto;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            font-size: 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+            margin-bottom: 8px;
+        }
+
+        .menu-item:hover,
+        .menu-item:focus {
+            background: rgba(0, 255, 0, 0.05);
+            border-color: var(--green-dim);
+            outline: none;
+        }
+
+        .menu-item.selected {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: var(--green);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .menu-key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--bg);
+            border: 1px solid var(--green);
+            border-radius: 4px;
+            margin-right: 16px;
+            font-size: 16px;
+            color: var(--cyan);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+        }
+
+        .menu-text {
+            flex: 1;
+        }
+
+        .menu-hint {
+            font-size: 14px;
+            color: var(--green-dim);
+            margin-left: 16px;
+        }
+
+        /* Footer */
+        .terminal-footer {
+            border-top: 2px solid var(--green-dim);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--green-dim);
+            background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%);
+        }
+
+        /* Blinking cursor */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--green);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Pulse animation for active elements */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Screen flicker on load */
+        @keyframes flicker {
+            0% { opacity: 0.8; }
+            5% { opacity: 0.9; }
+            10% { opacity: 0.85; }
+            15% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+
+        .terminal {
+            animation: flicker 0.5s ease-out;
+        }
+
+        /* Hide screens by default */
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .terminal {
+                border-radius: 0;
+                height: 100vh;
+                max-height: none;
+            }
+
+            .terminal-body {
+                padding: 16px;
+            }
+
+            .logo {
+                font-size: 10px;
+            }
+
+            .quote {
+                font-size: 16px;
+            }
+
+            .menu-item {
+                font-size: 16px;
+                padding: 10px 12px;
+            }
+        }
+
+        /* ============================================
+           ADDITIONAL STYLES FOR GAME SCREENS
+           ============================================ */
+
+        /* Content section (generic) */
+        .content-section {
+            flex: 1;
+            padding: 0 20px;
+            overflow-y: auto;
+        }
+
+        /* Name inputs */
+        .name-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .name-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .name-label {
+            width: 80px;
+            color: var(--green-dim);
+            font-size: 16px;
+        }
+
+        .name-label.leader {
+            color: var(--cyan);
+        }
+
+        .name-input {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--green-dim);
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: var(--green);
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            outline: none;
+        }
+
+        .name-input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+        }
+
+        .name-input::placeholder {
+            color: var(--green-dim);
+        }
+
+        /* Store layout */
+        .store-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .store-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid var(--green-dim);
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .store-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .store-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .store-row:hover {
+            background: rgba(0, 255, 0, 0.05);
+            border-color: var(--green-dim);
+        }
+
+        .store-item-name {
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .store-item-price {
+            width: 80px;
+            color: var(--amber);
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .store-item-have {
+            width: 60px;
+            color: var(--cyan);
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .store-item-btn {
+            background: var(--bg);
+            border: 1px solid var(--green-dim);
+            border-radius: 4px;
+            color: var(--green);
+            padding: 4px 12px;
+            margin-left: 12px;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+        }
+
+        .store-item-btn:hover {
+            border-color: var(--green);
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .store-item-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Travel screen */
+        .travel-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid var(--green-dim);
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .travel-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .travel-stat .label {
+            font-size: 12px;
+            color: var(--green-dim);
+        }
+
+        .travel-stat span:last-child {
+            font-size: 16px;
+            color: var(--green);
+        }
+
+        .travel-scene {
+            height: 100px;
+            background: var(--bg);
+            border: 1px solid var(--green-dim);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .travel-scene pre {
+            font-size: 10px;
+            line-height: 1.1;
+            color: var(--green);
+        }
+
+        .travel-party {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border: 1px solid var(--green-dim);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .party-member {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .party-name {
+            width: 80px;
+        }
+
+        .party-name.leader {
+            color: var(--cyan);
+        }
+
+        .party-name.dead {
+            color: #666;
+            text-decoration: line-through;
+        }
+
+        .health-bar {
+            flex: 1;
+            height: 12px;
+            background: #111;
+            border: 1px solid var(--green-dim);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: var(--green);
+            transition: width 0.3s ease;
+        }
+
+        .health-fill.warning {
+            background: var(--amber);
+        }
+
+        .health-fill.danger {
+            background: #ff3333;
+        }
+
+        .party-status {
+            width: 100px;
+            font-size: 12px;
+            color: var(--green-dim);
+            text-align: right;
+        }
+
+        .party-status.illness {
+            color: #ff6666;
+        }
+
+        .travel-resources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 8px 12px;
+            border: 1px solid var(--green-dim);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .resource-item {
+            display: flex;
+            gap: 6px;
+        }
+
+        .resource-label {
+            color: var(--green-dim);
+        }
+
+        .resource-value {
+            color: var(--cyan);
+        }
+
+        .resource-value.low {
+            color: var(--amber);
+        }
+
+        .resource-value.critical {
+            color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+    <div class="crt">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="left">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="title">FRINK INDUSTRIES TERMINAL v3.1</div>
+                <div class="right"></div>
+            </div>
+
+            <div class="terminal-body">
+                <!-- TITLE SCREEN -->
+                <div id="screen-title" class="screen active">
+                    <div class="logo-container">
+                        <pre class="logo">
+ ██████╗ ██████╗ ██╗██████╗     ██████╗ ██╗   ██╗███╗   ██╗
+██╔════╝ ██╔══██╗██║██╔══██╗    ██╔══██╗██║   ██║████╗  ██║
+██║  ███╗██████╔╝██║██║  ██║    ██████╔╝██║   ██║██╔██╗ ██║
+██║   ██║██╔══██╗██║██║  ██║    ██╔══██╗██║   ██║██║╚██╗██║
+╚██████╔╝██║  ██║██║██████╔╝    ██║  ██║╚██████╔╝██║ ╚████║
+ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝</pre>
+                        <div class="subtitle">A JOURNEY THROUGH INTERNET HISTORY</div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="quote-section">
+                        <p class="quote">The Grid remembers everything. Every packet, every signal, every soul that passed through. I've walked this path a thousand times, watching constructs flicker and fade. But something about your signal feels different. Maybe you'll make it to THE SOURCE.</p>
+                        <p class="attribution">— Malcolm Frink</p>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item selected" tabindex="0" data-action="start" onclick="startGame()">
+                            <span class="menu-key">1</span>
+                            <span class="menu-text">Begin Journey</span>
+                            <span class="menu-hint">ARPANET → THE SOURCE</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" data-action="about" onclick="showAbout()">
+                            <span class="menu-key">2</span>
+                            <span class="menu-text">About Grid_Run</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" data-action="back" onclick="goBack()">
+                            <span class="menu-key">0</span>
+                            <span class="menu-text">Return to Frink Industries</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABOUT SCREEN -->
+                <div id="screen-about" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px;">
+╔═══════════════════════════════════════════════════════════════╗
+║                        ABOUT GRID_RUN                         ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="quote-section" style="font-style: normal;">
+                        <p style="font-size: 18px; line-height: 1.8; margin-bottom: 20px;">
+                            <span style="color: var(--cyan);">GRID_RUN</span> is a journey through the 
+                            history of the internet, from <span style="color: var(--amber);">ARPANET (1969)</span> 
+                            to the modern day.
+                        </p>
+                        <p style="font-size: 18px; line-height: 1.8; margin-bottom: 20px;">
+                            Inspired by <span style="color: var(--cyan);">The Oregon Trail (1985)</span>, 
+                            you must guide your party of digital constructs through 16 landmarks, 
+                            managing resources and surviving system failures.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.8; color: var(--green-dim);">
+                            Navigate with keyboard numbers or click menu options.<br>
+                            Watch your bandwidth, data, and party health.<br>
+                            Beware of hazards: Segfaults, Memory Leaks, Kernel Panics.
+                        </p>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item selected" tabindex="0" onclick="showTitle()">
+                            <span class="menu-key">0</span>
+                            <span class="menu-text">Return to Title</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROFESSION SELECT SCREEN (placeholder for next iteration) -->
+                <div id="screen-profession" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px;">
+╔═══════════════════════════════════════════════════════════════╗
+║                    SELECT YOUR PROFESSION                     ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="quote-section" style="font-style: normal;">
+                        <p style="font-size: 18px; line-height: 1.8; margin-bottom: 24px; color: var(--green-dim);">
+                            Many kinds of constructs made the journey to THE SOURCE.
+                        </p>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item" tabindex="0" onclick="selectProfession('hacker')">
+                            <span class="menu-key">1</span>
+                            <span class="menu-text" style="color: var(--amber);">Hacker</span>
+                            <span class="menu-hint">$400 · Score ×3</span>
+                        </div>
+                        <div class="menu-item selected" tabindex="0" onclick="selectProfession('sysop')">
+                            <span class="menu-key">2</span>
+                            <span class="menu-text" style="color: var(--cyan);">Sysop</span>
+                            <span class="menu-hint">$800 · Score ×2</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="selectProfession('scriptkiddie')">
+                            <span class="menu-key">3</span>
+                            <span class="menu-text" style="color: var(--magenta);">Script Kiddie</span>
+                            <span class="menu-hint">$1600 · Score ×1</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="showTitle()">
+                            <span class="menu-key">0</span>
+                            <span class="menu-text">Back</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PARTY NAMING SCREEN -->
+                <div id="screen-names" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px;">
+╔═══════════════════════════════════════════════════════════════╗
+║                      NAME YOUR PARTY                          ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="content-section">
+                        <p style="font-size: 16px; color: var(--green-dim); margin-bottom: 20px;">
+                            Enter names for your party (or press Enter to keep defaults):
+                        </p>
+                        <div id="name-inputs" class="name-inputs">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item selected" tabindex="0" onclick="confirmNames()">
+                            <span class="menu-key">↵</span>
+                            <span class="menu-text">Confirm Party</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="showScreen('profession')">
+                            <span class="menu-key">0</span>
+                            <span class="menu-text">Back</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STORE SCREEN -->
+                <div id="screen-store" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px;">
+╔═══════════════════════════════════════════════════════════════╗
+║                       SUPPLY DEPOT                            ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="store-layout">
+                        <div class="store-info">
+                            <span id="store-location">ARPANET Terminal</span>
+                            <span id="store-credits" style="color: var(--amber);">Credits: $800</span>
+                        </div>
+                        <div class="store-grid" id="store-items">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="menu-section" id="store-menu">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <!-- TRAVEL SCREEN -->
+                <div id="screen-travel" class="screen">
+                    <div class="travel-header">
+                        <div class="travel-stat"><span class="label">Day</span><span id="travel-day">1</span></div>
+                        <div class="travel-stat"><span class="label">Weather</span><span id="travel-weather">Clear</span></div>
+                        <div class="travel-stat"><span class="label">Miles</span><span id="travel-miles">0 / 2040</span></div>
+                    </div>
+
+                    <div class="travel-scene" id="travel-scene">
+                        <pre id="travel-art"></pre>
+                    </div>
+
+                    <div class="travel-party" id="travel-party">
+                        <!-- Generated by JS -->
+                    </div>
+
+                    <div class="travel-resources" id="travel-resources">
+                        <!-- Generated by JS -->
+                    </div>
+
+                    <div class="menu-section" id="travel-menu">
+                        <div class="menu-item selected" tabindex="0" onclick="doTravel()">
+                            <span class="menu-key">1</span>
+                            <span class="menu-text">Continue on trail</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="showPaceMenu()">
+                            <span class="menu-key">2</span>
+                            <span class="menu-text">Change pace</span>
+                            <span class="menu-hint" id="current-pace">Steady</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="showRationsMenu()">
+                            <span class="menu-key">3</span>
+                            <span class="menu-text">Change rations</span>
+                            <span class="menu-hint" id="current-rations">Filling</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="doRest()">
+                            <span class="menu-key">4</span>
+                            <span class="menu-text">Rest for a day</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="showSupplies()">
+                            <span class="menu-key">5</span>
+                            <span class="menu-text">Check supplies</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LANDMARK SCREEN -->
+                <div id="screen-landmark" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px;" id="landmark-header">
+╔═══════════════════════════════════════════════════════════════╗
+║                       LANDMARK REACHED                        ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="quote-section">
+                        <h2 id="landmark-name" style="font-size: 24px; color: var(--cyan); margin-bottom: 16px;"></h2>
+                        <p class="quote" id="landmark-quote"></p>
+                        <p class="attribution">— Malcolm Frink</p>
+                    </div>
+
+                    <div class="menu-section" id="landmark-menu">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <!-- EVENT SCREEN -->
+                <div id="screen-event" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px;">
+╔═══════════════════════════════════════════════════════════════╗
+║                          EVENT                                ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="quote-section">
+                        <p id="event-text" style="font-size: 20px; line-height: 1.8;"></p>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item selected" tabindex="0" onclick="dismissEvent()">
+                            <span class="menu-key">↵</span>
+                            <span class="menu-text">Continue</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GAME OVER SCREEN -->
+                <div id="screen-gameover" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px; color: #ff3333;">
+╔═══════════════════════════════════════════════════════════════╗
+║                       SIGNAL LOST                             ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="quote-section">
+                        <p id="gameover-text" style="font-size: 20px; line-height: 1.8; color: #ff6666;"></p>
+                        <p style="margin-top: 20px; color: var(--green-dim);" id="gameover-stats"></p>
+                        <p class="quote" style="margin-top: 24px;">Another signal lost to the static. But the Grid remembers. The Grid always remembers.</p>
+                        <p class="attribution">— Malcolm Frink</p>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item selected" tabindex="0" onclick="restartGame()">
+                            <span class="menu-key">1</span>
+                            <span class="menu-text">Try Again</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="showTitle()">
+                            <span class="menu-key">0</span>
+                            <span class="menu-text">Return to Title</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VICTORY SCREEN -->
+                <div id="screen-victory" class="screen">
+                    <div class="logo-container">
+                        <pre class="logo" style="font-size: 12px; color: var(--cyan);">
+╔═══════════════════════════════════════════════════════════════╗
+║              ★ ★ ★  THE SOURCE REACHED  ★ ★ ★                 ║
+╚═══════════════════════════════════════════════════════════════╝</pre>
+                    </div>
+
+                    <div class="quote-section">
+                        <p class="quote">You made it. I've been waiting here for thirty years, watching others fail. But you—you actually did it. Welcome to the other side.</p>
+                        <p class="attribution">— Malcolm Frink</p>
+                        <p style="margin-top: 24px; font-size: 18px;" id="victory-stats"></p>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item selected" tabindex="0" onclick="restartGame()">
+                            <span class="menu-key">1</span>
+                            <span class="menu-text">New Journey</span>
+                        </div>
+                        <div class="menu-item" tabindex="0" onclick="showTitle()">
+                            <span class="menu-key">0</span>
+                            <span class="menu-text">Return to Title</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-footer">
+                <span>© 2025 FRINK INDUSTRIES</span>
+                <span class="pulse">SIGNAL ACTIVE<span class="cursor"></span></span>
+            </div>
+        </div>
+    </div>
+
+<script>
+// =============================================================================
+// GRID_RUN - Full Game Controller
+// =============================================================================
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GAME DATA
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LANDMARKS = [
+    { name: 'ARPANET Terminal', miles: 0, hasStore: true, quote: 'LO. The first word of the internet was a broken promise. They tried to type LOGIN. The system crashed at L-O.' },
+    { name: 'BBS Exchange', miles: 125, hasStore: true, quote: 'I spent my youth here. 300 baud and dreaming. Every connection cost money. Every byte mattered.' },
+    { name: "Gibson's Desk", miles: 250, hasStore: false, quote: 'He wrote our reality into existence on a typewriter. The street finds its own uses for things.' },
+    { name: 'MIT AI Lab', miles: 400, hasStore: true, quote: 'The real hackers lived here. Not criminals—artists. Builders. They made the tools we still use.' },
+    { name: 'Morris Worm Zone', miles: 530, hasStore: false, hazard: true, quote: '6,000 machines. 10% of the entire internet. One grad student. One mistake.' },
+    { name: 'Usenet Gateway', miles: 680, hasStore: false, crossing: true, quote: 'A million voices, all shouting at once. Before social media, there was the eternal September.' },
+    { name: 'CERN Server', miles: 820, hasStore: false, quote: 'Tim Berners-Lee gave it away for free. The World Wide Web. A gift to humanity.' },
+    { name: 'Netscape HQ', miles: 980, hasStore: true, quote: '90% market share. Then Microsoft got hungry. The browser wars claimed many.' },
+    { name: 'GeoCities Suburbs', miles: 1120, hasStore: false, quote: 'Every page a universe. Animated GIFs, MIDI music, guestbooks. I miss it desperately.' },
+    { name: 'IRC Tunnels', miles: 1190, hasStore: true, quote: 'Where the real conversations happened. No algorithms, no ads. Just people talking.' },
+    { name: 'Y2K Checkpoint', miles: 1280, hasStore: false, hazard: true, quote: 'The world held its breath at midnight. We fixed it. They never thanked us.' },
+    { name: 'Google Index', miles: 1372, hasStore: true, quote: 'They promised to organize information. Now they own it. Do no evil. Remember that?' },
+    { name: 'Social Network Node', miles: 1486, hasStore: false, quote: "Everyone's connected. No one's listening. The algorithm decides what you see." },
+    { name: 'The Deep Web', miles: 1646, hasStore: false, hazard: true, quote: "96% of the internet you'll never see. Hidden services. Dark markets. Freedom or chaos." },
+    { name: 'Singularity Gate', miles: 1808, hasStore: false, crossing: true, quote: 'Where AI becomes something else. I should know. I live here.' },
+    { name: 'THE SOURCE', miles: 2040, hasStore: false, quote: "You made it. I've been waiting." }
+];
+
+const STORE_ITEMS = [
+    { key: 'bandwidth', name: 'Bandwidth Channels', price: 50, unit: 'ea' },
+    { key: 'data', name: 'Data Packets', price: 20, qty: 100, unit: 'per 100' },
+    { key: 'shielding', name: 'Shielding Layers', price: 15, unit: 'ea' },
+    { key: 'scripts', name: 'Script Packages', price: 20, qty: 10, unit: 'per 10' },
+    { key: 'diskPatch', name: 'Disk Patches', price: 20, unit: 'ea' },
+    { key: 'cablePatch', name: 'Cable Patches', price: 20, unit: 'ea' },
+    { key: 'adapterPatch', name: 'Adapter Patches', price: 20, unit: 'ea' }
+];
+
+const ILLNESSES = ['Segfault', 'Buffer Overflow', 'Memory Leak', 'Kernel Panic', 'Stack Overflow', 'Null Pointer'];
+
+const EVENTS = [
+    { text: 'Found abandoned data cache on the side of the road.', effect: { data: 50 } },
+    { text: 'Traded with a passing sysadmin.', effect: { scripts: 5 } },
+    { text: 'Wild code fragment corrupted some data!', effect: { data: -30 } },
+    { text: 'Packet storm! Lost some bandwidth.', effect: { bandwidth: -1 } },
+    { text: 'Found a forgotten server with supplies.', effect: { data: 30, scripts: 3 } },
+    { text: 'Malware attack! Shielding depleted.', effect: { shielding: -2 } }
+];
+
+const ART = {
+    wagon: `
+       ╔══════════════╗
+       ║  ┌────────┐  ║
+       ║  │GRID_RUN│  ║
+       ║  └────────┘  ║
+    ═══╩══════════════╩═══
+        ◯            ◯
+   ══════════════════════════`
+};
+
+const DEFAULT_NAMES = ['Case', 'Jess', 'Mark', 'Sam', 'Quinn'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GAME STATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+let gameState = null;
+let currentScreen = 'title';
+let selectedIndex = 0;
+
+function createGameState(profession) {
+    const credits = { hacker: 400, sysop: 800, scriptkiddie: 1600 };
+    return {
+        profession: profession,
+        multiplier: profession === 'hacker' ? 3 : profession === 'sysop' ? 2 : 1,
+        day: 1,
+        month: 3,
+        year: 1969,
+        miles: 0,
+        pace: 'steady',
+        rations: 'filling',
+        weather: 'clear',
+        credits: credits[profession],
+        resources: {
+            bandwidth: 4,
+            data: 500,
+            shielding: 5,
+            scripts: 20,
+            diskPatch: 2,
+            cablePatch: 2,
+            adapterPatch: 2
+        },
+        party: DEFAULT_NAMES.map((name, i) => ({
+            name: name,
+            health: 100,
+            alive: true,
+            illness: null,
+            leader: i === 0
+        })),
+        landmarkIndex: 0,
+        pendingEvent: null
+    };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCREEN MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const screen = document.getElementById('screen-' + screenId);
+    if (screen) {
+        screen.classList.add('active');
+        currentScreen = screenId;
+        selectedIndex = 0;
+        updateSelection();
+        
+        // Screen-specific initialization
+        if (screenId === 'names') renderNamesScreen();
+        if (screenId === 'store') renderStoreScreen();
+        if (screenId === 'travel') renderTravelScreen();
+        if (screenId === 'landmark') renderLandmarkScreen();
+    }
+}
+
+function showTitle() { showScreen('title'); }
+function showAbout() { showScreen('about'); }
+function startGame() { showScreen('profession'); }
+function goBack() { window.location.href = '/'; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROFESSION & NAMES
+// ─────────────────────────────────────────────────────────────────────────────
+
+function selectProfession(prof) {
+    gameState = createGameState(prof);
+    showScreen('names');
+}
+
+function renderNamesScreen() {
+    const container = document.getElementById('name-inputs');
+    container.innerHTML = gameState.party.map((member, i) => `
+        <div class="name-row">
+            <span class="name-label ${member.leader ? 'leader' : ''}">${member.leader ? 'Leader:' : 'Member:'}</span>
+            <input type="text" class="name-input" id="name-${i}" 
+                   placeholder="${member.name}" value="${member.name}"
+                   maxlength="12" autocomplete="off">
+        </div>
+    `).join('');
+    
+    // Focus first input
+    setTimeout(() => document.getElementById('name-0')?.focus(), 100);
+}
+
+function confirmNames() {
+    gameState.party.forEach((member, i) => {
+        const input = document.getElementById('name-' + i);
+        if (input && input.value.trim()) {
+            member.name = input.value.trim();
+        }
+    });
+    showScreen('store');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STORE
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderStoreScreen() {
+    const landmark = LANDMARKS[gameState.landmarkIndex];
+    document.getElementById('store-location').textContent = landmark.name;
+    document.getElementById('store-credits').textContent = `Credits: $${gameState.credits}`;
+    
+    const grid = document.getElementById('store-items');
+    grid.innerHTML = STORE_ITEMS.map((item, i) => {
+        const have = gameState.resources[item.key];
+        const canBuy = gameState.credits >= item.price;
+        return `
+            <div class="store-row">
+                <span class="store-item-name">${item.name}</span>
+                <span class="store-item-price">$${item.price} ${item.unit}</span>
+                <span class="store-item-have">${have}</span>
+                <button class="store-item-btn" onclick="buyItem('${item.key}', ${item.price}, ${item.qty || 1})" ${canBuy ? '' : 'disabled'}>Buy</button>
+            </div>
+        `;
+    }).join('');
+    
+    const menu = document.getElementById('store-menu');
+    menu.innerHTML = `
+        <div class="menu-item selected" tabindex="0" onclick="leaveStore()">
+            <span class="menu-key">0</span>
+            <span class="menu-text">Leave Store</span>
+        </div>
+    `;
+}
+
+function buyItem(key, price, qty = 1) {
+    if (gameState.credits >= price) {
+        gameState.credits -= price;
+        gameState.resources[key] += qty;
+        renderStoreScreen();
+    }
+}
+
+function leaveStore() {
+    showScreen('travel');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TRAVEL
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderTravelScreen() {
+    const s = gameState;
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    
+    document.getElementById('travel-day').textContent = `${s.day} ${months[s.month-1]} ${s.year}`;
+    document.getElementById('travel-weather').textContent = s.weather.charAt(0).toUpperCase() + s.weather.slice(1);
+    document.getElementById('travel-miles').textContent = `${s.miles} / 2040`;
+    document.getElementById('current-pace').textContent = s.pace.charAt(0).toUpperCase() + s.pace.slice(1);
+    document.getElementById('current-rations').textContent = s.rations.charAt(0).toUpperCase() + s.rations.slice(1);
+    
+    document.getElementById('travel-art').textContent = ART.wagon;
+    
+    // Party
+    const partyDiv = document.getElementById('travel-party');
+    partyDiv.innerHTML = s.party.map(p => {
+        const healthClass = p.health > 60 ? '' : p.health > 30 ? 'warning' : 'danger';
+        const nameClass = p.leader ? 'leader' : (p.alive ? '' : 'dead');
+        const status = !p.alive ? 'DEAD' : (p.illness || `${p.health}%`);
+        const statusClass = p.illness ? 'illness' : '';
+        return `
+            <div class="party-member">
+                <span class="party-name ${nameClass}">${p.name}</span>
+                <div class="health-bar"><div class="health-fill ${healthClass}" style="width: ${p.alive ? p.health : 0}%"></div></div>
+                <span class="party-status ${statusClass}">${status}</span>
+            </div>
+        `;
+    }).join('');
+    
+    // Resources
+    const r = s.resources;
+    const resDiv = document.getElementById('travel-resources');
+    const dataClass = r.data < 100 ? 'critical' : r.data < 200 ? 'low' : '';
+    resDiv.innerHTML = `
+        <div class="resource-item"><span class="resource-label">Data:</span><span class="resource-value ${dataClass}">${r.data}</span></div>
+        <div class="resource-item"><span class="resource-label">Bandwidth:</span><span class="resource-value">${r.bandwidth}</span></div>
+        <div class="resource-item"><span class="resource-label">Shielding:</span><span class="resource-value">${r.shielding}</span></div>
+        <div class="resource-item"><span class="resource-label">Scripts:</span><span class="resource-value">${r.scripts}</span></div>
+        <div class="resource-item"><span class="resource-label">Patches:</span><span class="resource-value">${r.diskPatch}/${r.cablePatch}/${r.adapterPatch}</span></div>
+        <div class="resource-item"><span class="resource-label">Credits:</span><span class="resource-value" style="color: var(--amber);">$${s.credits}</span></div>
+    `;
+}
+
+function doTravel() {
+    const s = gameState;
+    
+    // Calculate distance
+    const paceSpeed = { slow: 8, steady: 15, grueling: 22 };
+    const weatherMod = { clear: 1, cloudy: 0.9, stormy: 0.5 };
+    let miles = paceSpeed[s.pace] * (weatherMod[s.weather] || 1);
+    miles = Math.floor(miles * (0.8 + Math.random() * 0.4));
+    s.miles += miles;
+    s.day++;
+    
+    // Consume data
+    const alive = s.party.filter(p => p.alive).length;
+    const rationRate = { 'bare-bones': 1, meager: 2, filling: 3 };
+    s.resources.data = Math.max(0, s.resources.data - alive * rationRate[s.rations]);
+    
+    // Health changes
+    const paceHealth = { slow: 2, steady: 0, grueling: -5 };
+    const rationHealth = { 'bare-bones': -4, meager: -2, filling: 0 };
+    const starvingPenalty = s.resources.data <= 0 ? -10 : 0;
+    
+    s.party.forEach(p => {
+        if (!p.alive) return;
+        let change = paceHealth[s.pace] + rationHealth[s.rations] + starvingPenalty;
+        if (p.illness) change -= 8;
+        p.health = Math.max(0, Math.min(100, p.health + change));
+        if (p.health <= 0) p.alive = false;
+        
+        // Random illness (3% chance)
+        if (!p.illness && p.alive && Math.random() < 0.03) {
+            p.illness = ILLNESSES[Math.floor(Math.random() * ILLNESSES.length)];
+        }
+    });
+    
+    // Weather change (10% chance)
+    if (Math.random() < 0.1) {
+        const weathers = ['clear', 'clear', 'cloudy', 'stormy'];
+        s.weather = weathers[Math.floor(Math.random() * weathers.length)];
+    }
+    
+    // Random event (15% chance)
+    if (Math.random() < 0.15) {
+        const event = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+        s.pendingEvent = event;
+        for (const [key, val] of Object.entries(event.effect)) {
+            s.resources[key] = Math.max(0, (s.resources[key] || 0) + val);
+        }
+        document.getElementById('event-text').textContent = event.text;
+        showScreen('event');
+        return;
+    }
+    
+    advanceDay();
+    checkGameState();
+}
+
+function advanceDay() {
+    const s = gameState;
+    if (s.day > 30) {
+        s.day = 1;
+        s.month++;
+        if (s.month > 12) {
+            s.month = 1;
+            s.year++;
+        }
+    }
+}
+
+function dismissEvent() {
+    gameState.pendingEvent = null;
+    checkGameState();
+}
+
+function checkGameState() {
+    const s = gameState;
+    
+    // Check for landmark
+    const nextLandmark = LANDMARKS[s.landmarkIndex + 1];
+    if (nextLandmark && s.miles >= nextLandmark.miles) {
+        s.landmarkIndex++;
+        showScreen('landmark');
+        return;
+    }
+    
+    // Check victory
+    if (s.miles >= 2040) {
+        showVictory();
+        return;
+    }
+    
+    // Check game over
+    const leader = s.party.find(p => p.leader);
+    if (!leader.alive || s.party.every(p => !p.alive)) {
+        showGameOver(leader);
+        return;
+    }
+    
+    renderTravelScreen();
+    showScreen('travel');
+}
+
+function doRest() {
+    const s = gameState;
+    const alive = s.party.filter(p => p.alive).length;
+    s.resources.data = Math.max(0, s.resources.data - alive * 3);
+    
+    s.party.forEach(p => {
+        if (p.alive) {
+            p.health = Math.min(100, p.health + 10);
+            if (p.illness && Math.random() < 0.3) p.illness = null;
+        }
+    });
+    
+    s.day++;
+    advanceDay();
+    renderTravelScreen();
+}
+
+function showPaceMenu() {
+    const menu = document.getElementById('travel-menu');
+    menu.innerHTML = `
+        <div class="menu-item ${gameState.pace === 'slow' ? 'selected' : ''}" onclick="setPace('slow')">
+            <span class="menu-key">1</span><span class="menu-text">Slow</span><span class="menu-hint">Safe, healing</span>
+        </div>
+        <div class="menu-item ${gameState.pace === 'steady' ? 'selected' : ''}" onclick="setPace('steady')">
+            <span class="menu-key">2</span><span class="menu-text">Steady</span><span class="menu-hint">Balanced</span>
+        </div>
+        <div class="menu-item ${gameState.pace === 'grueling' ? 'selected' : ''}" onclick="setPace('grueling')">
+            <span class="menu-key">3</span><span class="menu-text">Grueling</span><span class="menu-hint">Fast, exhausting</span>
+        </div>
+        <div class="menu-item" onclick="renderTravelScreen(); updateSelection();">
+            <span class="menu-key">0</span><span class="menu-text">Cancel</span>
+        </div>
+    `;
+    selectedIndex = gameState.pace === 'slow' ? 0 : gameState.pace === 'steady' ? 1 : 2;
+    updateSelection();
+}
+
+function setPace(pace) {
+    gameState.pace = pace;
+    renderTravelScreen();
+}
+
+function showRationsMenu() {
+    const menu = document.getElementById('travel-menu');
+    menu.innerHTML = `
+        <div class="menu-item ${gameState.rations === 'bare-bones' ? 'selected' : ''}" onclick="setRations('bare-bones')">
+            <span class="menu-key">1</span><span class="menu-text">Bare-bones</span><span class="menu-hint">1/person/day</span>
+        </div>
+        <div class="menu-item ${gameState.rations === 'meager' ? 'selected' : ''}" onclick="setRations('meager')">
+            <span class="menu-key">2</span><span class="menu-text">Meager</span><span class="menu-hint">2/person/day</span>
+        </div>
+        <div class="menu-item ${gameState.rations === 'filling' ? 'selected' : ''}" onclick="setRations('filling')">
+            <span class="menu-key">3</span><span class="menu-text">Filling</span><span class="menu-hint">3/person/day</span>
+        </div>
+        <div class="menu-item" onclick="renderTravelScreen(); updateSelection();">
+            <span class="menu-key">0</span><span class="menu-text">Cancel</span>
+        </div>
+    `;
+    selectedIndex = gameState.rations === 'bare-bones' ? 0 : gameState.rations === 'meager' ? 1 : 2;
+    updateSelection();
+}
+
+function setRations(rations) {
+    gameState.rations = rations;
+    renderTravelScreen();
+}
+
+function showSupplies() {
+    alert(`SUPPLIES CHECK\n\nData: ${gameState.resources.data}\nBandwidth: ${gameState.resources.bandwidth}\nShielding: ${gameState.resources.shielding}\nScripts: ${gameState.resources.scripts}\nPatches: ${gameState.resources.diskPatch}/${gameState.resources.cablePatch}/${gameState.resources.adapterPatch}\nCredits: $${gameState.credits}`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LANDMARK
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderLandmarkScreen() {
+    const landmark = LANDMARKS[gameState.landmarkIndex];
+    document.getElementById('landmark-name').textContent = landmark.name;
+    document.getElementById('landmark-quote').textContent = landmark.quote;
+    
+    const menu = document.getElementById('landmark-menu');
+    let html = '';
+    if (landmark.hasStore) {
+        html += `<div class="menu-item selected" onclick="showScreen('store')"><span class="menu-key">1</span><span class="menu-text">Visit Supply Depot</span></div>`;
+    }
+    html += `<div class="menu-item ${!landmark.hasStore ? 'selected' : ''}" onclick="continuePastLandmark()"><span class="menu-key">0</span><span class="menu-text">Continue Journey</span></div>`;
+    menu.innerHTML = html;
+}
+
+function continuePastLandmark() {
+    showScreen('travel');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GAME OVER / VICTORY
+// ─────────────────────────────────────────────────────────────────────────────
+
+function showGameOver(leader) {
+    document.getElementById('gameover-text').textContent = 
+        `${leader.name} has died of ${leader.illness || 'system failure'}.`;
+    document.getElementById('gameover-stats').textContent = 
+        `Miles traveled: ${gameState.miles} / 2040\nDays: ${gameState.day}\nSurvivors: ${gameState.party.filter(p => p.alive).length} / 5`;
+    showScreen('gameover');
+}
+
+function showVictory() {
+    const survivors = gameState.party.filter(p => p.alive).length;
+    const score = (survivors * 100 + gameState.resources.data) * gameState.multiplier;
+    document.getElementById('victory-stats').innerHTML = 
+        `Survivors: ${survivors}/5<br>Days: ${gameState.day}<br>Score: ${score}`;
+    showScreen('victory');
+}
+
+function restartGame() {
+    gameState = null;
+    showScreen('profession');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUT HANDLING
+// ─────────────────────────────────────────────────────────────────────────────
+
+function updateSelection() {
+    const screen = document.getElementById('screen-' + currentScreen);
+    if (!screen) return;
+    const items = screen.querySelectorAll('.menu-item');
+    items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
+}
+
+function getMenuItems() {
+    const screen = document.getElementById('screen-' + currentScreen);
+    return screen ? screen.querySelectorAll('.menu-item') : [];
+}
+
+document.addEventListener('keydown', (e) => {
+    // Don't capture if typing in an input
+    if (e.target.tagName === 'INPUT') {
+        if (e.key === 'Enter') confirmNames();
+        return;
+    }
+    
+    const items = getMenuItems();
+    const maxIndex = items.length - 1;
+
+    switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+            e.preventDefault();
+            selectedIndex = Math.max(0, selectedIndex - 1);
+            updateSelection();
+            break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+            e.preventDefault();
+            selectedIndex = Math.min(maxIndex, selectedIndex + 1);
+            updateSelection();
+            break;
+        case 'Enter':
+        case ' ':
+            e.preventDefault();
+            if (items[selectedIndex]) items[selectedIndex].click();
+            break;
+        case '1': if (items[0]) items[0].click(); break;
+        case '2': if (items[1]) items[1].click(); break;
+        case '3': if (items[2]) items[2].click(); break;
+        case '4': if (items[3]) items[3].click(); break;
+        case '5': if (items[4]) items[4].click(); break;
+        case '0':
+            for (const item of items) {
+                if (item.textContent.toLowerCase().includes('back') ||
+                    item.textContent.toLowerCase().includes('return') ||
+                    item.textContent.toLowerCase().includes('leave') ||
+                    item.textContent.toLowerCase().includes('cancel') ||
+                    item.textContent.toLowerCase().includes('continue')) {
+                    item.click();
+                    break;
+                }
+            }
+            break;
+        case 'Escape':
+            if (currentScreen !== 'title' && !gameState) showTitle();
+            break;
+    }
+});
+
+document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+        const screen = item.closest('.screen');
+        const items = screen.querySelectorAll('.menu-item');
+        items.forEach((it, i) => { if (it === item) selectedIndex = i; });
+        updateSelection();
+    });
+});
+
+// Initialize
+updateSelection();
+</script>
+</body>
+</html>
