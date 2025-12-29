@@ -61,6 +61,12 @@ git push origin main
 ## Content
 The text content is currently stored in `script.js` within the `manifestoText` variable. To update the displayed message, edit the string in that file.
 
+## Legal & Compliance
+**MANDATORY:** All pages must include the standard footer disclaimer.
+*   **Requirement:** State that the site is fictional and any similarities are coincidental.
+*   **Ownership:** Must explicitly state ownership by `sid3.xyz` and affiliation with the `Straylight Echo` project.
+*   **Links:** Should link to the parent projects where appropriate.
+
 ## Troubleshooting
 *   **Domain not updating:** Cloudflare Pages can take a few seconds to invalidate the cache. Hard refresh the browser (`Ctrl+F5`).
 *   **Wrangler errors:** Ensure `wrangler` is authenticated (`wrangler whoami`) and updated (`npm install -g wrangler`).
