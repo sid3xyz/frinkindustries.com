@@ -293,24 +293,19 @@ footer {
 
 /* Terminal Menu */
 #terminal-menu {
-    margin-top: 2rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px double var(--term-dim);
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    opacity: 1;
-    transition: opacity 1s ease-in;
-}
-
-#terminal-menu.hidden {
-    opacity: 0;
-    pointer-events: none;
-    /* We use opacity for a fade-in effect instead of display:none */
+    width: 100%;
 }
 
 .menu-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.8rem;
+    gap: 1rem;
     align-items: center;
 }
 

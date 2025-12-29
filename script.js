@@ -36,7 +36,6 @@ And I am back online.
 > AWAITING_INPUT...`;
 
 const outputElement = document.getElementById('output');
-const menuElement = document.getElementById('terminal-menu');
 const typingSpeed = 30; // ms per char
 
 let charIndex = 0;
@@ -61,19 +60,13 @@ function typeWriter() {
 
         setTimeout(typeWriter, delay);
         
-        // Auto-scroll to bottom
-        window.scrollTo(0, document.body.scrollHeight);
-    } else {
-        // Reveal the menu
-        menuElement.classList.remove('hidden');
-        // Final scroll
-        window.scrollTo(0, document.body.scrollHeight);
+        // Auto-scroll the main terminal area
+        const terminalContainer = document.querySelector('main');
+        terminalContainer.scrollTop = terminalContainer.scrollHeight;
     }
 }
 
 // Start typing when page loads
 window.onload = () => {
-    // Ensure menu is hidden on load (failsafe)
-    menuElement.classList.add('hidden');
     setTimeout(typeWriter, 1500);
 };
