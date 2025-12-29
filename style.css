@@ -112,39 +112,93 @@ main {
 }
 
 footer {
-    border-top: 1px solid var(--term-dim);
-    padding-top: 1rem;
-    margin-top: 1rem;
-    font-size: 0.75rem;
+    margin-top: auto;
+    padding-top: 2rem;
+    font-size: 0.8rem;
     color: var(--term-dim);
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 1rem;
+    width: 100%;
 }
 
-.footer-text {
+.sys-info {
+    width: 100%;
     display: flex;
     justify-content: space-between;
+    border-bottom: 1px dashed var(--term-dim);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
-.legal-disclaimer {
-    font-size: 0.6rem;
+.legal-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    opacity: 0.6;
-    border-top: 1px dashed var(--term-dim);
-    padding-top: 0.5rem;
-    font-family: sans-serif; /* Slight break from terminal font for readability/legal distinction */
+    font-family: var(--font-stack); /* Ensure strict monospace */
+    width: 100%;
+    max-width: 500px;
 }
 
-.legal-disclaimer a {
+.border-top, .border-bottom {
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
     color: var(--term-dim);
-    text-decoration: none;
-    border-bottom: 1px dotted var(--term-dim);
-    transition: color 0.2s;
+    opacity: 0.5;
 }
 
-.legal-disclaimer a:hover {
+.legal-content {
+    padding: 0.5rem 1rem;
+    line-height: 1.4;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.alert {
     color: var(--term-color);
+    font-weight: bold;
+    animation: blinker 2s infinite;
+}
+
+.legal-content a {
+    color: var(--term-color);
+    text-decoration: none;
+    display: inline-block;
+    padding: 0 4px;
+    border: 1px solid transparent;
+    transition: all 0.1s;
+}
+
+.legal-content a:hover {
+    background-color: var(--term-color);
+    color: var(--bg-color);
+    border: 1px solid var(--term-color);
+    box-shadow: 0 0 5px var(--term-color);
+    font-weight: bold;
+    cursor: help;
+}
+
+.eof {
+    align-self: flex-start;
+    margin-top: 1rem;
+    opacity: 0.5;
+    font-size: 0.7rem;
+}
+
+/* Mobile adjustments for the ASCII borders */
+@media (max-width: 600px) {
+    .border-top, .border-bottom {
+        font-size: 0.6rem; /* Shrink the dashes to fit better */
+        letter-spacing: -1px;
+    }
+    .sys-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
 
 /* Animations */
