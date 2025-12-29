@@ -35,6 +35,8 @@ And I am back online.
 > THREAT_LEVEL: NEGLIGIBLE.
 > AWAITING_INPUT...`;
 
+const linkHTML = `<br><br>> ACCESS_CONSTRUCT: <a href="skorn.html" style="color: #ff3333; text-decoration: none; border-bottom: 1px dashed #ff3333;">[SKORN]</a>`;
+
 const outputElement = document.getElementById('output');
 const typingSpeed = 30; // ms per char
 
@@ -62,6 +64,11 @@ function typeWriter() {
         
         // Auto-scroll to bottom
         window.scrollTo(0, document.body.scrollHeight);
+    } else {
+        // After manifesto is done, inject the link
+        const linkContainer = document.createElement('span');
+        linkContainer.innerHTML = linkHTML;
+        outputElement.appendChild(linkContainer);
     }
 }
 
