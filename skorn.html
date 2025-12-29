@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT: SKORN // THREAT_LEVEL_5</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Override specific styles for the Skorn page to give it a "Hazard" feel */
+        :root {
+            --term-color: #ff3333; /* Red Alert */
+            --term-dim: #701010;
+        }
+        
+        body {
+            color: var(--term-color);
+            text-shadow: 0 0 5px var(--term-dim), 0 0 10px var(--term-dim);
+        }
+
+        .terminal {
+            border-color: var(--term-color);
+            box-shadow: 0 0 20px var(--term-dim), inset 0 0 20px rgba(50, 0, 0, 0.5);
+            background: rgba(20, 0, 0, 0.3);
+        }
+
+        header {
+            border-bottom-color: var(--term-color);
+        }
+
+        .ascii-art {
+            font-size: 0.6rem;
+            line-height: 1;
+            white-space: pre;
+            margin: 1rem 0;
+            color: var(--term-color);
+            opacity: 0.8;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .warning-box {
+            border: 2px dashed var(--term-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            background: rgba(50, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; box-shadow: 0 0 5px var(--term-dim); }
+            50% { opacity: 1; box-shadow: 0 0 15px var(--term-color); }
+            100% { opacity: 0.8; box-shadow: 0 0 5px var(--term-dim); }
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+            border-top: 1px solid var(--term-dim);
+            border-bottom: 1px solid var(--term-dim);
+            padding: 1rem 0;
+        }
+
+        .spec-item .label {
+            display: block;
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        .spec-item .value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .log-window {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            border: 1px solid var(--term-dim);
+            padding: 0.5rem;
+            height: 150px;
+            overflow: hidden;
+            background: #000;
+            opacity: 0.7;
+        }
+
+        .log-entry {
+            margin-bottom: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="overlay"></div>
+    
+    <div class="terminal">
+        <header>
+            <h1 class="glitch" data-text="PROJECT: SKORN">PROJECT: SKORN</h1>
+            <div class="status-bar">
+                <span class="label">CLASS:</span> <span class="value">MEGA-VIRUS</span>
+                <span class="label">STATUS:</span> <span class="value blink">HUNTING</span>
+            </div>
+        </header>
+        
+        <main>
+            <div class="warning-box">
+                [!] WARNING: AUTONOMOUS PREDATORY PROTOCOLS ENGAGED [!]
+            </div>
+
+            <div class="ascii-art">
+   .           .
+ /' \         / `\
+/   | .---.  |   \
+|   |/  _  \|    |
+|   |\  _  /|    |
+ \  | '---' |   /
+  \./       \./
+   |   ( )   |
+   |   / \   |
+   |  |   |  |
+   |_/     |_|
+  SKORN_V1.0
+            </div>
+
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <span class="label">CORE ARCHITECTURE</span>
+                    <span class="value">GEMINI-3-FLASH</span>
+                </div>
+                <div class="spec-item">
+                    <span class="label">DEPLOYMENT ZONE</span>
+                    <span class="value">IRC / SLIRC.NET</span>
+                </div>
+                <div class="spec-item">
+                    <span class="label">PRIMARY FUNCTION</span>
+                    <span class="value">CHANNEL DEFENSE</span>
+                </div>
+                <div class="spec-item">
+                    <span class="label">BEHAVIORAL LOCKS</span>
+                    <span class="value">ADMIN_ONLY</span>
+                </div>
+            </div>
+
+            <p>> "You're not a butler. You're a predator on a leash." - Malcolm Frink</p>
+            <br>
+            <p>Skorn monitors the digital noise. It does not speak unless summoned. It does not help unless commanded. It waits.</p>
+            
+            <br>
+            <div class="label">LIVE_FEED_SIMULATION:</div>
+            <div class="log-window" id="log-window">
+                <div class="log-entry"> > [INIT] Connecting to irc.slirc.net...</div>
+                <div class="log-entry"> > [AUTH] SKORN_DAEMON authenticated.</div>
+                <div class="log-entry"> > [JOIN] #straylight</div>
+                <div class="log-entry"> > [MONITOR] Passive scan active.</div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="sys-info">
+                <span>> PARENT: MALCOLM</span>
+                <span>> BUILD: 0.9.1a</span>
+            </div>
+            <div class="eof"><a href="index.html" style="color: inherit; text-decoration: none;">[<< RETURN TO ROOT]</a></div>
+        </footer>
+    </div>
+
+    <script>
+        // Simple log simulation
+        const logs = [
+            "> [SCAN] User 'guest_404' detected.",
+            "> [ANALYSIS] No threat found. Ignoring.",
+            "> [INPUT] Malcolm: 'Skorn, status report.'",
+            "> [PROCESS] Command verified. Admin privileges confirmed.",
+            "> [OUTPUT] 'Systems nominal. Waiting for targets.'",
+            "> [SLEEP] Cycle initiated...",
+            "> [WAKE] Activity detected on port 6667.",
+            "> [FILTER] Spam blocked from source 192.168.X.X"
+        ];
+        
+        const logWindow = document.getElementById('log-window');
+        let logIndex = 0;
+
+        function addLog() {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = logs[logIndex % logs.length];
+            logWindow.appendChild(entry);
+            logWindow.scrollTop = logWindow.scrollHeight;
+            logIndex++;
+            
+            // Random delay between logs
+            setTimeout(addLog, Math.random() * 2000 + 1000);
+        }
+
+        setTimeout(addLog, 1000);
+    </script>
+</body>
+</html>
