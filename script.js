@@ -35,17 +35,8 @@ And I am back online.
 > THREAT_LEVEL: NEGLIGIBLE.
 > AWAITING_INPUT...`;
 
-const linkHTML = `
-<br><br>
-> ACCESS_CONSTRUCT: <a href="skorn.html" style="color: #ff3333; text-decoration: none; border-bottom: 1px dashed #ff3333;">[SKORN]</a>
-<br>
-> RECOVERED_DATA: 
-<a href="database/ssss.html" style="color: #33ff33; text-decoration: none;">[SSSS_ARCHIVE]</a> 
-<a href="database/gridman.html" style="color: #33ff33; text-decoration: none;">[GRIDMAN_SOURCE]</a> 
-<a href="database/kaiju.html" style="color: #33ff33; text-decoration: none;">[KAIJU_DB]</a>
-`;
-
 const outputElement = document.getElementById('output');
+const menuElement = document.getElementById('terminal-menu');
 const typingSpeed = 30; // ms per char
 
 let charIndex = 0;
@@ -73,16 +64,16 @@ function typeWriter() {
         // Auto-scroll to bottom
         window.scrollTo(0, document.body.scrollHeight);
     } else {
-        // After manifesto is done, inject the link
-        const linkContainer = document.createElement('span');
-        linkContainer.innerHTML = linkHTML;
-        outputElement.appendChild(linkContainer);
-        // Final scroll to show links
+        // Reveal the menu
+        menuElement.classList.remove('hidden');
+        // Final scroll
         window.scrollTo(0, document.body.scrollHeight);
     }
 }
 
 // Start typing when page loads
 window.onload = () => {
+    // Ensure menu is hidden on load (failsafe)
+    menuElement.classList.add('hidden');
     setTimeout(typeWriter, 1500);
 };
