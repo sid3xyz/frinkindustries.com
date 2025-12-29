@@ -18,12 +18,27 @@ This repository contains the source code for **frinkindustries.com**, a gritty, 
 ## Project Structure
 ```text
 .
-├── index.html      # Main entry point. Contains the DOM structure for the terminal.
-├── style.css       # Visual styling. Handles CRT effects, glow, animations, and responsiveness.
-├── script.js       # Logic. Handles the "typing" effect of the manifesto.
+├── index.html      # Main entry point (Terminal Interface).
+├── style.css       # Terminal styling.
+├── script.js       # Terminal logic.
+├── corp/           # Corporate Facade Directory.
+│   ├── index.html  # Corporate Landing Page.
+│   ├── style.css   # Corporate Minimalist Stylesheet.
+│   └── team/       # Team Profile Pages.
+│       ├── malcolm.html
+│       ├── spiral.html
+│       └── case.html
 ├── WEBSITE_INFO.md # This file.
+├── DESIGN_DOC.md   # Architectural Vision.
 └── .git/           # Local git repository data.
 ```
+
+## Corporate Facade (`/corp`)
+A secondary interface acting as the "public face" of Frink Industries.
+*   **Concept:** A brutalist, hyper-efficient corporate site designed by Malcolm.
+*   **URL:** `frinkindustries.com/corp`
+*   **Styling:** Located in `corp/style.css`. distinct from the root terminal style.
+*   **Team:** Profile pages located in `corp/team/`.
 
 ## Development Workflow
 
