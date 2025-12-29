@@ -3,8 +3,12 @@ import { GameEngine } from './core/engine.js';
 import { TerminalUI } from './ui/terminal.js';
 import { HUD } from './ui/hud.js';
 import { bus } from './core/events.js';
+import { GridViewport } from './viewport/viewport.js';
 
 const SAVE_KEY = 'FRINK_GRID_RUN_SAVE';
+
+// Store viewport reference for cleanup
+let viewport = null;
 
 // Screen elements
 const bootScreen = document.getElementById('boot-screen');
@@ -59,13 +63,37 @@ function continueGame() {
 function launchGame() {
     showScreen(gameScreen);
     
-    // Clear any existing content
-    gameScreen.innerHTML = '';
+    // Get containers (viewport and terminal are now separate)
+    const viewportContainer = document.getElementById('viewport-container');
+    const terminalContainer = document.getElementById('terminal-container');
     
-    // Initialize game components
+    if (!terminalContainer) {
+        console.error("[GRID_RUN] Terminal container not found");
+        return;
+    }
+    
+    // Clear terminal container only (viewport is separate)
+    terminalContainer.innerHTML = '';
+    
+    // Initialize 3D Viewport (The Grid)
+    if (viewportContainer && !viewport) {
+        viewport = new GridViewport('viewport-container');
+        const viewportInitialized = viewport.init();
+        
+        // Hide loading indicator on success
+        if (viewportInitialized) {
+            const loadingEl = viewportContainer.querySelector('.viewport-loading');
+            if (loadingEl) {
+                loadingEl.classList.add('hidden');
+            }
+            console.log("[GRID_RUN] Viewport initialized");
+        }
+    }
+    
+    // Initialize UI components
     // Order matters: TerminalUI creates #game-output, HUD inserts before it
-    new TerminalUI('game-screen');
-    new HUD('game-screen');
+    new TerminalUI('terminal-container');
+    new HUD('terminal-container');
     new GameEngine();
     
     // Start game
@@ -130,6 +158,11 @@ document.addEventListener('keydown', (e) => {
 
 // Listen for game quit to return to menu
 bus.on('QUIT_TO_MENU', () => {
+    // Dispose viewport to free WebGL resources
+    if (viewport) {
+        viewport.dispose();
+        viewport = null;
+    }
     showScreen(bootScreen);
     checkSaveGame();
 });

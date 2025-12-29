@@ -7,6 +7,16 @@
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="grid_run.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ff3333%22/></svg>">
+    
+    <!-- Three.js Import Map for ES6 Modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
 </head>
 <body class="grid-run-page">
     <div class="scanlines"></div>
@@ -100,9 +110,20 @@
             </main>
         </div>
 
-        <!-- GAME SCREEN -->
+        <!-- GAME SCREEN (with 3D viewport + terminal) -->
         <div id="game-screen" class="game-screen hidden">
-            <!-- HUD and Terminal will be injected here by JS -->
+            <!-- 3D Viewport (The Grid) -->
+            <div id="viewport-container" class="viewport-container">
+                <!-- Three.js canvas will be injected here -->
+                <div class="viewport-loading">
+                    <span class="loading-text">INITIALIZING GRID...</span>
+                </div>
+            </div>
+            
+            <!-- Terminal Area (text output/input) -->
+            <div id="terminal-container" class="terminal-container">
+                <!-- HUD and Terminal will be injected here by JS -->
+            </div>
         </div>
     </div>
 

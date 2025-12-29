@@ -304,14 +304,8 @@
     line-height: 1.6;
 }
 
-/* === GAME SCREEN (Oregon Trail Gameplay Style) === */
-.game-screen {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 85vh;
-    padding: 0;
-}
+/* === GAME SCREEN === */
+/* Note: Main .game-screen styles are now at the bottom of the file (viewport section) */
 
 /* Oregon Trail-style HUD - top status bar */
 .terminal-hud {
@@ -565,10 +559,14 @@
     }
 
     .boot-screen,
-    .about-screen,
-    .game-screen {
+    .about-screen {
         padding: 1rem;
         min-height: 95vh;
+    }
+    
+    /* Game screen uses viewport layout, don't override */
+    .game-screen {
+        padding: 0;
     }
 
     .game-title {
@@ -616,4 +614,169 @@
     .terminal-btn:hover {
         transition: none;
     }
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   THREE.JS VIEWPORT — Split-Screen Layout
+   Top: 3D Grid visualization
+   Bottom: Terminal text interface
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* === GAME SCREEN SPLIT LAYOUT === */
+.game-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 100vh;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* === VIEWPORT CONTAINER (3D Canvas) === */
+.viewport-container {
+    position: relative;
+    width: 100%;
+    height: 45vh;
+    min-height: 250px;
+    background: #000505;
+    border-bottom: 2px solid var(--term-color);
+    box-shadow: 
+        0 2px 20px rgba(0, 255, 0, 0.2),
+        inset 0 -10px 30px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+}
+
+/* Three.js canvas fills container */
+.viewport-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Loading state */
+.viewport-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--term-color);
+    font-family: monospace;
+    font-size: 0.9rem;
+    text-shadow: 0 0 10px var(--term-color);
+    animation: loadingPulse 1.5s infinite;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.viewport-loading.hidden {
+    display: none;
+}
+
+@keyframes loadingPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Viewport overlay effects */
+.viewport-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 90%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Scanline overlay for viewport */
+.viewport-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.4;
+}
+
+/* === TERMINAL CONTAINER (Text Area) === */
+.terminal-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Allow flex shrinking */
+    overflow: hidden;
+    background: rgba(0, 5, 0, 0.95);
+}
+
+/* === NO WEBGL FALLBACK === */
+.no-webgl .viewport-container {
+    display: none;
+}
+
+.no-webgl .terminal-container {
+    height: 100vh;
+}
+
+.no-webgl .game-screen {
+    height: auto;
+    min-height: 100vh;
+}
+
+/* === VIEWPORT RESPONSIVE === */
+@media (max-width: 768px) {
+    .viewport-container {
+        height: 35vh;
+        min-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .viewport-container {
+        height: 30vh;
+        min-height: 150px;
+    }
+}
+
+/* Landscape mode on mobile - reduce viewport */
+@media (max-height: 500px) and (orientation: landscape) {
+    .viewport-container {
+        height: 40vh;
+        min-height: 150px;
+    }
+}
+
+/* Tall screens - give viewport more space */
+@media (min-height: 900px) {
+    .viewport-container {
+        height: 50vh;
+    }
+}
+
+/* === VIEWPORT ERA TRANSITIONS === */
+.viewport-container.era-80s {
+    border-color: #00ff00;
+}
+
+.viewport-container.era-90s {
+    border-color: #00ffff;
+}
+
+.viewport-container.era-2000s {
+    border-color: #ffffff;
 }
