@@ -21,13 +21,16 @@ This repository contains the source code for **frinkindustries.com**, a gritty, 
 ├── index.html      # Main entry point (Terminal Interface).
 ├── style.css       # Terminal styling.
 ├── script.js       # Terminal logic.
+├── skorn.html      # Skorn Construct Page.
 ├── corp/           # Corporate Facade Directory.
 │   ├── index.html  # Corporate Landing Page.
 │   ├── style.css   # Corporate Minimalist Stylesheet.
 │   └── team/       # Team Profile Pages.
-│       ├── malcolm.html
-│       ├── spiral.html
-│       └── case.html
+├── database/       # Recovered Data Archives (Fan Pages).
+│   ├── ssss.html   # SSSS Fan Page.
+│   ├── gridman.html# Gridman Fan Page.
+│   ├── kaiju.html  # Kaiju Database.
+│   └── style_archive.css # Retro Web 1.0 Stylesheet.
 ├── WEBSITE_INFO.md # This file.
 ├── DESIGN_DOC.md   # Architectural Vision.
 └── .git/           # Local git repository data.

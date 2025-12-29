@@ -35,7 +35,15 @@ And I am back online.
 > THREAT_LEVEL: NEGLIGIBLE.
 > AWAITING_INPUT...`;
 
-const linkHTML = `<br><br>> ACCESS_CONSTRUCT: <a href="skorn.html" style="color: #ff3333; text-decoration: none; border-bottom: 1px dashed #ff3333;">[SKORN]</a>`;
+const linkHTML = `
+<br><br>
+> ACCESS_CONSTRUCT: <a href="skorn.html" style="color: #ff3333; text-decoration: none; border-bottom: 1px dashed #ff3333;">[SKORN]</a>
+<br>
+> RECOVERED_DATA: 
+<a href="database/ssss.html" style="color: #33ff33; text-decoration: none;">[SSSS_ARCHIVE]</a> 
+<a href="database/gridman.html" style="color: #33ff33; text-decoration: none;">[GRIDMAN_SOURCE]</a> 
+<a href="database/kaiju.html" style="color: #33ff33; text-decoration: none;">[KAIJU_DB]</a>
+`;
 
 const outputElement = document.getElementById('output');
 const typingSpeed = 30; // ms per char
@@ -69,6 +77,8 @@ function typeWriter() {
         const linkContainer = document.createElement('span');
         linkContainer.innerHTML = linkHTML;
         outputElement.appendChild(linkContainer);
+        // Final scroll to show links
+        window.scrollTo(0, document.body.scrollHeight);
     }
 }
 
