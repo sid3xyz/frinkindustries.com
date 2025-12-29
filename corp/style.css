@@ -103,8 +103,27 @@ p.lead {
 /* FOOTER */
 footer {
     border-top: var(--border-style);
-    padding: 2rem;
+    padding: 3rem 2rem;
     text-align: center;
-    font-size: 0.8rem;
     background: #fff;
+}
+
+.corp-disclaimer {
+    max-width: 600px;
+    margin: 1.5rem auto 0;
+    font-size: 0.7rem;
+    color: var(--corp-grey);
+    line-height: 1.5;
+    text-transform: none; /* Keep legal text readable */
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.corp-disclaimer a {
+    color: var(--corp-black);
+    text-decoration: underline;
+}
+
+.corp-disclaimer a:hover {
+    color: var(--corp-grey);
 }
