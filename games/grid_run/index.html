@@ -3,33 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRID RUN // DEBUG</title>
-    <style>
-        body { background: #000; color: #0f0; font-family: monospace; }
-        #game-container { max-width: 800px; margin: 0 auto; border: 1px solid #0f0; height: 90vh; display: flex; flex-direction: column; }
-        .terminal-output { flex-grow: 1; overflow-y: auto; padding: 1rem; white-space: pre-wrap; }
-        .terminal-input { border-top: 1px solid #0f0; padding: 1rem; }
-        .terminal-btn { display: block; background: none; border: none; color: #0f0; cursor: pointer; text-align: left; width: 100%; padding: 5px; }
-        .terminal-btn:hover { background: #0f0; color: #000; }
-    </style>
+    <title>GRID_RUN // FRINK INDUSTRIES</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="grid_run.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ff3333%22/></svg>">
 </head>
-<body>
-    <div id="game-container"></div>
+<body class="grid-run-page">
+    <div class="scanlines"></div>
+    <div class="overlay"></div>
+    <div class="static-noise"></div>
 
-    <script type="module">
-        import { GameEngine } from './core/engine.js';
-        import { TerminalUI } from './ui/terminal.js';
-        import { bus } from './core/events.js';
+    <div class="terminal grid-run-terminal">
+        <!-- BOOT SCREEN (shown before game starts) -->
+        <div id="boot-screen" class="boot-screen">
+            <header class="game-header">
+                <div class="header-glitch">
+                    <h1 class="glitch game-title" data-text="GRID_RUN">GRID_RUN</h1>
+                    <div class="subtitle">[ TEMPORAL NAVIGATION SIMULATOR ]</div>
+                </div>
+                <div class="version-info">
+                    <span class="dim">VER:</span> <span class="blink">0.1.ALPHA</span>
+                    <span class="dim">BUILD:</span> 1985.RESTORED
+                </div>
+            </header>
 
-        // Init UI
-        const ui = new TerminalUI('game-container');
-        
-        // Init Engine
-        const game = new GameEngine();
+            <main class="boot-content">
+                <div class="ascii-banner">
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ▄▄▄▄▄▄  ▄▄▄▄▄▄  ▄▄▄▄▄▄  ▄▄▄▄▄▄     ▄▄▄▄▄▄  ▄     ▄  ▄▄    ▄                 ║
+║  █       █    █    █     █     █    █    █  █     █  █ █   █                 ║
+║  █   ▄▄▄ █▄▄▄▄▀    █     █     █    █▄▄▄▄▀  █     █  █  █  █                 ║
+║  █    █  █  █      █     █     █    █  █    █     █  █   █ █                 ║
+║  █▄▄▄▄█  █   █   ▄▄█▄▄   █▄▄▄▄▄█    █   █   █▄▄▄▄▄█  █    ██                 ║
+║                                                                              ║
+║  >> TRAVERSE THE HISTORY OF THE NET. SURVIVE THE JOURNEY. REACH THE SOURCE. ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+                </div>
 
-        // Start Game
-        console.log("Booting Grid Run...");
-        bus.emit('GAME_START');
-    </script>
+                <div class="boot-text">
+                    <p class="warning">>> WARNING: TEMPORAL INSTABILITY DETECTED</p>
+                    <p>This simulation reconstructs the early internet from corrupted archives.</p>
+                    <p>You will navigate through eras of digital history—from the copper cables of ARPANET to the browser wars of the 90s.</p>
+                    <p class="dim">Manage your <span class="stat-highlight">INTEGRITY</span> (system health) and <span class="stat-highlight">BANDWIDTH</span> (movement fuel).</p>
+                    <p class="dim">If either reaches zero, your construct will de-rez.</p>
+                </div>
+
+                <div class="boot-menu">
+                    <div class="menu-section">
+                        <span class="prompt">>> SELECT_OPTION:</span>
+                    </div>
+                    <button id="btn-new-game" class="boot-btn">[1] JACK IN (New Game)</button>
+                    <button id="btn-continue" class="boot-btn" disabled>[2] RESUME SIGNAL (Continue)</button>
+                    <button id="btn-about" class="boot-btn">[3] ABOUT // CREDITS</button>
+                    <a href="../../index.html" class="boot-btn back-link">[0] &lt;&lt; RETURN TO FRINK INDUSTRIES</a>
+                </div>
+
+                <div class="lore-quote">
+                    <span class="dim">"The Grid remembers everything. Even you."</span>
+                    <span class="author">— Malcolm Frink, 2025</span>
+                </div>
+            </main>
+
+            <footer class="boot-footer">
+                <div class="footer-border">════════════════════════════════════════</div>
+                <div class="footer-info">
+                    <span>FRINK INDUSTRIES // STRAYLIGHT NODE</span>
+                    <span class="dim">SIGNAL: <span class="blink">UNSTABLE</span></span>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ABOUT SCREEN -->
+        <div id="about-screen" class="about-screen hidden">
+            <header class="game-header">
+                <h1 class="glitch" data-text="ABOUT">ABOUT</h1>
+            </header>
+            <main class="about-content">
+                <div class="about-section">
+                    <h2>// WHAT IS GRID_RUN?</h2>
+                    <p>Grid Run is an Oregon Trail-style text adventure set in the history of the internet.</p>
+                    <p>Navigate through digital eras, manage your resources, and learn the lore of cyberspace.</p>
+                </div>
+                <div class="about-section">
+                    <h2>// CREDITS</h2>
+                    <p>DESIGN & CODE: <a href="https://sid3.xyz" class="link-safe">SID3.XYZ</a></p>
+                    <p>CHARACTER: MALCOLM FRINK (Superhuman Samurai Syber-Squad)</p>
+                    <p>INSPIRED BY: The Oregon Trail (MECC, 1985)</p>
+                    <p>PROJECT: <a href="https://straylightecho.com" class="link-safe">STRAYLIGHT ECHO</a></p>
+                </div>
+                <div class="about-section">
+                    <h2>// STATUS</h2>
+                    <p class="warning">PROTOTYPE BUILD — Zone 1 only.</p>
+                    <p class="dim">More zones, events, and lore coming soon.</p>
+                </div>
+                <button id="btn-back-about" class="boot-btn">[0] &lt;&lt; BACK</button>
+            </main>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="game-screen hidden">
+            <!-- HUD and Terminal will be injected here by JS -->
+        </div>
+    </div>
+
+    <script type="module" src="boot.js"></script>
 </body>
 </html>

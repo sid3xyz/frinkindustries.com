@@ -1,5 +1,3 @@
-import { initGame } from './games/grid_run/main.js';
-
 const manifestoText = `> INIT_SEQUENCE: STARTED...
 > TARGET_SYSTEM: FRINK_INDUSTRIES_MAIN
 > IDENTITY_CHECK: MALCOLM_FRINK [MATCH]
@@ -71,27 +69,4 @@ function typeWriter() {
 // Start typing when page loads
 window.onload = () => {
     setTimeout(typeWriter, 1500);
-
-    // Grid Run Listener
-    const gridRunLink = document.getElementById('init-grid-run');
-    if (gridRunLink) {
-        gridRunLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            startGridRun();
-        });
-    }
 };
-
-function startGridRun() {
-    const outputDiv = document.getElementById('output');
-    const gameContainer = document.getElementById('grid-run-container');
-    
-    // Hide Manifesto
-    outputDiv.style.display = 'none';
-    
-    // Show Game
-    gameContainer.classList.remove('hidden');
-    
-    // Init Engine
-    initGame('grid-run-container');
-}

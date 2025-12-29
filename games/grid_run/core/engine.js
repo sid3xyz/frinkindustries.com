@@ -48,21 +48,27 @@ export class GameEngine {
         if (action.cost) {
             const costBw = action.cost.bandwidth || 0;
             const costInt = action.cost.integrity || 0;
+            const costCredits = action.cost.credits || 0;
 
             if (player.bandwidth < costBw) {
                 bus.emit('TEXT_MSG', ">> CRITICAL: INSUFFICIENT BANDWIDTH.");
+                return;
+            }
+            if (player.credits < costCredits) {
+                bus.emit('TEXT_MSG', ">> INSUFFICIENT CREDITS. You need " + costCredits + " credits.");
                 return;
             }
             
             // Apply costs
             const newStats = {
                 bandwidth: Math.max(0, player.bandwidth - costBw),
-                integrity: Math.max(0, player.integrity - costInt)
+                integrity: Math.max(0, player.integrity - costInt),
+                credits: Math.max(0, (player.credits || 0) - costCredits)
             };
             
             // Apply Rewards
             if (action.reward) {
-                if (action.reward.credits) newStats.credits = (player.credits || 0) + action.reward.credits;
+                if (action.reward.credits) newStats.credits = (newStats.credits || 0) + action.reward.credits;
                 if (action.reward.bandwidth) newStats.bandwidth += action.reward.bandwidth;
             }
 

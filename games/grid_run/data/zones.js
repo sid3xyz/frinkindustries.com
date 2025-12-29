@@ -34,10 +34,22 @@ export const zones = {
                 cost: { bandwidth: 10 }
             },
             {
-                label: "Scan for Lost Packets (Cost: 5 Integrity)",
+                label: "Scan for Lost Packets (Cost: 5 Integrity, +10 Credits)",
                 cost: { integrity: 5 },
                 reward: { credits: 10 },
-                effect: { msg: "You recover some fragmented headers. +10 Credits." }
+                effect: { next_node: "ZONE_1_ARPANET_SCANNED" }
+            }
+        ]
+    },
+    "ZONE_1_ARPANET_SCANNED": {
+        id: "ZONE_1_ARPANET_SCANNED",
+        title: "ARPANET HUB [1983]",
+        description: ">> SCAN COMPLETE: Recovered fragmented headers. +10 Credits.\n\nThe copper cables still hum with ancient data.",
+        choices: [
+            {
+                label: "Travel to The BBS Exchange (Cost: 10 BW)", 
+                effect: { next_node: "ZONE_1_BBS" },
+                cost: { bandwidth: 10 }
             }
         ]
     },
@@ -91,14 +103,10 @@ export const zones = {
     "ZONE_1_END": {
         id: "ZONE_1_END",
         title: "ZONE 1 COMPLETE",
-        description: "You have survived the Analog Age. The static clears.\n\nAhead lies ZONE 2: THE BATTLEGROUNDS (1995).\nThe era of the Grid Wars.",
+        description: "You have survived the Analog Age. The static clears.\n\n>> TRANSMISSION ENDS <<\nZone 2: THE BATTLEGROUNDS (1995) is under construction.\n\nThank you for playing the Grid Run Prototype!",
         choices: [
             {
-                label: "Enter Zone 2 (Coming Soon...)",
-                effect: { msg: "End of Prototype. Thanks for playing!" }
-            },
-             {
-                label: "Reboot Simulation",
+                label: "[RESTART] Reboot Simulation",
                 command: "RESET"
             }
         ]

@@ -11,10 +11,10 @@ export function initGame(containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
 
-    // Init components
-    new HUD(containerId);     // Status bars
-    new TerminalUI(containerId); // Text output/input
-    new GameEngine();         // Logic
+    // Init components (order matters: TerminalUI creates #game-output, HUD inserts before it)
+    new TerminalUI(containerId); // Text output/input - creates #game-output
+    new HUD(containerId);        // Status bars - inserts before #game-output
+    new GameEngine();            // Logic
     
     // Start
     bus.emit('GAME_START');
