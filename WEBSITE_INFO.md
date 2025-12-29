@@ -30,6 +30,7 @@ This repository contains the source code for **frinkindustries.com**, a gritty, 
 │   ├── ssss.html   # SSSS Fan Page.
 │   ├── gridman.html# Gridman Fan Page.
 │   ├── kaiju.html  # Kaiju Database.
+│   ├── LORE_GRID_WARS.md # The Narrative Bible for Zone 2.
 │   └── style_archive.css # Retro Web 1.0 Stylesheet.
 ├── WEBSITE_INFO.md # This file.
 ├── DESIGN_DOC.md   # Architectural Vision.
