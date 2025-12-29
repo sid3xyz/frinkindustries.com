@@ -89,6 +89,21 @@
         .log-entry {
             margin-bottom: 0.2rem;
         }
+
+        @media (max-width: 600px) {
+            .spec-grid {
+                grid-template-columns: 1fr; /* Stack columns */
+                gap: 0.5rem;
+            }
+            
+            .ascii-art {
+                font-size: 0.5rem; /* Smaller ASCII */
+            }
+
+            .log-window {
+                font-size: 0.7rem;
+            }
+        }
     </style>
 </head>
 <body>
