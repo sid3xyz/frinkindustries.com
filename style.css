@@ -1,10 +1,10 @@
 :root {
     --bg-color: #050505;
-    --term-color: #33ff33; /* Classic Terminal Green */
-    --term-dim: #1a801a;
+    --term-color: #00ff00; /* Vibrant Green */
+    --term-dim: #008f00;
     --scan-color: rgba(0, 0, 0, 0.5);
-    --glitch-color: #ff3333;
-    --font-stack: 'Courier New', Courier, monospace;
+    --glitch-color: #ff00ff;
+    --font-stack: 'Courier New', Courier, monospace; /* Keeping it simple/safe */
 }
 
 * {
@@ -23,8 +23,8 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 16px;
-    line-height: 1.5;
-    text-shadow: 0 0 5px var(--term-dim);
+    line-height: 1.4;
+    text-shadow: 0 0 4px var(--term-dim), 0 0 8px var(--term-dim); /* Enhanced Glow */
 }
 
 /* CRT Effects */
@@ -38,12 +38,13 @@ body {
         to bottom,
         rgba(255,255,255,0),
         rgba(255,255,255,0) 50%,
-        rgba(0,0,0,0.2) 50%,
-        rgba(0,0,0,0.2)
+        rgba(0,0,0,0.3) 50%,
+        rgba(0,0,0,0.3)
     );
     background-size: 100% 4px;
     pointer-events: none;
     z-index: 10;
+    animation: scrollScanlines 10s linear infinite;
 }
 
 .overlay {
@@ -52,30 +53,32 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(10, 20, 10, 0) 60%, rgba(0, 0, 0, 1) 100%);
+    background: radial-gradient(circle, rgba(10, 50, 10, 0) 50%, rgba(0, 0, 0, 0.9) 100%);
     pointer-events: none;
     z-index: 9;
 }
 
 /* Terminal Container */
 .terminal {
-    width: 90%;
-    max-width: 800px;
+    width: 95%;
+    max-width: 900px;
     height: 90vh;
     display: flex;
     flex-direction: column;
     padding: 2rem;
-    border: 1px solid var(--term-dim);
-    background: rgba(0, 20, 0, 0.2);
+    border: 2px solid var(--term-dim);
+    background: rgba(0, 20, 0, 0.3);
     position: relative;
     z-index: 1;
+    box-shadow: 0 0 20px var(--term-dim), inset 0 0 20px rgba(0, 50, 0, 0.5);
+    animation: flicker 0.15s infinite; /* CRT Flicker */
 }
 
 /* Typography */
 header {
     border-bottom: 2px solid var(--term-color);
     padding-bottom: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -83,43 +86,61 @@ header {
 }
 
 h1 {
-    font-size: 2.5rem;
-    letter-spacing: 2px;
+    font-size: 2rem;
+    letter-spacing: 4px;
     text-transform: uppercase;
     position: relative;
+    margin-bottom: 0.5rem;
 }
 
-.status {
-    font-size: 0.9rem;
-    font-weight: bold;
+.status-bar {
+    font-size: 0.8rem;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.status-bar .label {
+    opacity: 0.7;
 }
 
 main {
     flex-grow: 1;
     overflow-y: auto;
     font-size: 1.1rem;
-    white-space: pre-wrap; /* Preserves whitespace/newlines */
+    white-space: pre-wrap;
+    padding-right: 1rem;
 }
 
 footer {
     border-top: 1px solid var(--term-dim);
     padding-top: 1rem;
-    margin-top: 2rem;
-    font-size: 0.8rem;
+    margin-top: 1rem;
+    font-size: 0.75rem;
     color: var(--term-dim);
     display: flex;
     justify-content: space-between;
 }
 
 /* Animations */
+@keyframes flicker {
+    0% { opacity: 0.97; }
+    50% { opacity: 1; }
+    100% { opacity: 0.98; }
+}
+
+@keyframes scrollScanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+}
+
 .blink {
     animation: blinker 1s step-end infinite;
 }
 
 .cursor {
     display: inline-block;
-    width: 10px;
-    height: 1.2em;
+    width: 0.6em;
+    height: 1.1em;
     background-color: var(--term-color);
     vertical-align: text-bottom;
     animation: blinker 1s step-end infinite;
@@ -129,7 +150,7 @@ footer {
     50% { opacity: 0; }
 }
 
-/* Glitch Effect on Hover or Static */
+/* Glitch Effect */
 .glitch {
     position: relative;
 }
@@ -143,52 +164,51 @@ footer {
     width: 100%;
     height: 100%;
     background: var(--bg-color);
+    clip: rect(0, 0, 0, 0);
 }
 
 .glitch::before {
     left: 2px;
-    text-shadow: -1px 0 var(--glitch-color);
-    clip: rect(24px, 550px, 90px, 0);
-    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+    text-shadow: -2px 0 var(--glitch-color);
+    animation: glitch-anim-2 4s infinite linear alternate-reverse;
 }
 
 .glitch::after {
     left: -2px;
-    text-shadow: -1px 0 #00ffff;
-    clip: rect(85px, 550px, 140px, 0);
-    animation: glitch-anim 2.5s infinite linear alternate-reverse;
+    text-shadow: -2px 0 cyan;
+    animation: glitch-anim 3s infinite linear alternate-reverse;
 }
 
+/* Glitch keyframes retained from previous version but adjusted if needed */
 @keyframes glitch-anim {
     0% { clip: rect(13px, 9999px, 88px, 0); }
-    20% { clip: rect(109px, 9999px, 32px, 0); }
-    40% { clip: rect(4px, 9999px, 112px, 0); }
-    60% { clip: rect(75px, 9999px, 60px, 0); }
-    80% { clip: rect(26px, 9999px, 13px, 0); }
+    5% { clip: rect(109px, 9999px, 32px, 0); }
+    10% { clip: rect(4px, 9999px, 112px, 0); }
+    /* ... sparse glitching ... */
     100% { clip: rect(63px, 9999px, 91px, 0); }
 }
 
 @keyframes glitch-anim-2 {
     0% { clip: rect(65px, 9999px, 100px, 0); }
-    20% { clip: rect(12px, 9999px, 7px, 0); }
-    40% { clip: rect(45px, 9999px, 39px, 0); }
-    60% { clip: rect(89px, 9999px, 16px, 0); }
-    80% { clip: rect(104px, 9999px, 59px, 0); }
+    5% { clip: rect(12px, 9999px, 7px, 0); }
+    /* ... sparse glitching ... */
     100% { clip: rect(31px, 9999px, 86px, 0); }
 }
 
-/* Scrollbar styling for Webkit */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 ::-webkit-scrollbar-track {
-    background: var(--bg-color); 
+    background: #000;
+    border-left: 1px solid var(--term-dim);
 }
 ::-webkit-scrollbar-thumb {
-    background: var(--term-dim); 
+    background: var(--term-dim);
+    border: 1px solid #000;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--term-color); 
+    background: var(--term-color);
 }
 
 /* Mobile Responsiveness */
@@ -197,12 +217,12 @@ footer {
         width: 100%;
         height: 100vh;
         border: none;
-        padding: 1rem;
+        padding: 1.5rem;
     }
     h1 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
     main {
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
 }

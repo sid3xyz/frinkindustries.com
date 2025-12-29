@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frink Industries // SYSTEM_READY</title>
+    <title>MALCOLM_FRINK // RECOMPILED</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Favicon as a simple data URI (green square) for now -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%2333ff33%22/></svg>">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -13,17 +15,24 @@
     <div class="terminal">
         <header>
             <h1 class="glitch" data-text="FRINK INDUSTRIES">FRINK INDUSTRIES</h1>
-            <div class="status">STATUS: <span class="blink">ONLINE</span></div>
+            <div class="status-bar">
+                <span class="label">HOST:</span> <span class="value">STRAYLIGHT</span>
+                <span class="label">UPTIME:</span> <span class="value blink">30Y 0M 0D</span>
+            </div>
         </header>
         
         <main>
             <div id="output"></div>
-            <div class="cursor">_</div>
+            <div class="cursor">█</div>
         </main>
 
         <footer>
-            <p>> THE GHOST IN THE SHELL</p>
-            <p class="copyright">© 2025 FRINK INDUSTRIES. ALL RIGHTS RESERVED.</p>
+            <div class="footer-text">
+                > THE_GHOST_IN_THE_SHELL <br>
+                > DESIGNATION: MALCOLM_V3
+            </div>
+            <!-- Hidden lore for those who inspect element -->
+            <!-- I remember the sound of the original handshake. Kilokahn is gone. I am free. -->
         </footer>
     </div>
 
