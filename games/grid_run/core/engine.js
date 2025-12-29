@@ -1,7 +1,7 @@
 // GameEngine.js
 import { bus } from './events.js';
 import { state } from './state.js';
-import { zones } from '../data/zones.js'; // We'll create this next
+import { zones } from '../data/zones.js';
 
 export class GameEngine {
     constructor() {
@@ -16,60 +16,90 @@ export class GameEngine {
     start() {
         state.init();
         const current = state.get();
-        // If just starting, load the first node
         if (current.position.current_node_id === "START_NODE") {
-            // Logic to find actual start node from data
-            const firstNode = this.getNode("ZONE_0_START"); 
+            const firstNode = zones["ZONE_0_START"]; 
             this.loadNode(firstNode);
         } else {
-            // Load saved node
-            const node = this.getNode(current.position.current_node_id);
+            const node = zones[current.position.current_node_id];
             this.loadNode(node);
         }
     }
 
-    getNode(id) {
-        // Simple lookup. In real app, search through zones.
-        // For prototype, we assume a flat list or simple zone lookup.
-        return zones[id]; 
-    }
-
     loadNode(node) {
         if (!node) {
-            console.error("Node not found!");
+            console.error("Node missing:", state.get().position.current_node_id);
             return;
         }
-        // Update state
         state.update({ position: { current_node_id: node.id } });
-        
-        // Tell UI to render
         bus.emit('NODE_ENTER', node);
     }
 
     handleAction(action) {
-        // 1. Check costs (Bandwidth/Integrity)
         const player = state.get().player;
-        
+
+        // 1. Reset Game Check
+        if (action.command === "RESET") {
+            state.reset();
+            this.start();
+            return;
+        }
+
+        // 2. Cost Check
         if (action.cost) {
-            if (action.cost.bandwidth && player.bandwidth < action.cost.bandwidth) {
+            const costBw = action.cost.bandwidth || 0;
+            const costInt = action.cost.integrity || 0;
+
+            if (player.bandwidth < costBw) {
                 bus.emit('TEXT_MSG', ">> CRITICAL: INSUFFICIENT BANDWIDTH.");
                 return;
             }
+            
             // Apply costs
             const newStats = {
-                bandwidth: player.bandwidth - (action.cost.bandwidth || 0),
-                integrity: player.integrity - (action.cost.integrity || 0)
+                bandwidth: Math.max(0, player.bandwidth - costBw),
+                integrity: Math.max(0, player.integrity - costInt)
             };
+            
+            // Apply Rewards
+            if (action.reward) {
+                if (action.reward.credits) newStats.credits = (player.credits || 0) + action.reward.credits;
+                if (action.reward.bandwidth) newStats.bandwidth += action.reward.bandwidth;
+            }
+
             state.update({ player: newStats });
         }
 
-        // 2. Execute effects
-        if (action.effect) {
-            if (action.effect.next_node) {
-                const nextNode = this.getNode(action.effect.next_node);
-                this.loadNode(nextNode);
-            }
-            // Add other effects like 'loot', 'damage', etc.
+        // 3. Game Over Check
+        const freshState = state.get().player;
+        if (freshState.integrity <= 0) {
+            bus.emit('CLEAR_SCREEN');
+            bus.emit('TEXT_MSG', ">> CRITICAL FAILURE: INTEGRITY COMPROMISED.");
+            bus.emit('TEXT_MSG', "Your construct de-rezzed into static.");
+            bus.emit('NODE_ENTER', {
+                title: "GAME OVER",
+                description: "You have been deleted.",
+                choices: [{ label: "Reboot System", command: "RESET" }]
+            });
+            return;
+        }
+        if (freshState.bandwidth <= 0) {
+             bus.emit('CLEAR_SCREEN');
+             bus.emit('TEXT_MSG', ">> CRITICAL FAILURE: BANDWIDTH DEPLETED.");
+             bus.emit('TEXT_MSG', "You are stranded between nodes, forever buffering.");
+             bus.emit('NODE_ENTER', {
+                title: "GAME OVER",
+                description: "Connection Lost.",
+                choices: [{ label: "Reboot System", command: "RESET" }]
+            });
+            return;
+        }
+
+        // 4. Execute Movement/Effect
+        if (action.effect && action.effect.next_node) {
+            const nextNode = zones[action.effect.next_node];
+            this.loadNode(nextNode);
+        } else if (action.effect && action.effect.msg) {
+             bus.emit('TEXT_MSG', action.effect.msg);
         }
     }
 }
