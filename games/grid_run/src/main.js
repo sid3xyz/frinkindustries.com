@@ -1,44 +1,15 @@
-/**
- * GRID_RUN - Entry Point
- * A Journey Through Internet History with Malcolm Frink
- * 
- * Inspired by The Oregon Trail (1985)
- */
+// src/main.js
+import { GameEngine } from './engine.js';
+import { TerminalUI } from './ui.js';
+import { HUD } from './hud.js';
+import { bus } from './events.js';
 
-import { Game } from './game.js';
+console.log("Initializing Grid Run (Vertical Slice)...");
 
-// =============================================================================
-// INITIALIZATION
-// =============================================================================
+// Initialize the UI components
+const ui = new TerminalUI('terminal');
+const hud = new HUD('hud-bar');
+const engine = new GameEngine();
 
-let game = null;
-
-function init() {
-  console.log('╔══════════════════════════════════════════════════════════════╗');
-  console.log('║                      GRID_RUN                                ║');
-  console.log('║         A Journey Through Internet History                   ║');
-  console.log('║                  with Malcolm Frink                          ║');
-  console.log('╚══════════════════════════════════════════════════════════════╝');
-  
-  // Create game instance
-  game = new Game();
-  
-  // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => game.init());
-  } else {
-    game.init();
-  }
-}
-
-// =============================================================================
-// START
-// =============================================================================
-
-init();
-
-// Expose for debugging
-window.GRID_RUN = {
-  game: () => game,
-  version: '0.1.0'
-};
+// Start the game loop
+bus.emit('GAME_START');
