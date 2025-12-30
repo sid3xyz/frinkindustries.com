@@ -3,54 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRID_RUN // FRINK INDUSTRIES</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <!-- Three.js from CDN for the viewport -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>GRID_RUN // DEBUG</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; height: 100vh; margin: 0; display: flex; flex-direction: column; }
+        #game-container { max-width: 800px; margin: 0 auto; border: 1px solid #0f0; flex-grow: 1; display: flex; flex-direction: column; padding: 1rem; width: 100%; box-sizing: border-box; }
+        
+        #hud-bar { border-bottom: 1px double #004400; margin-bottom: 1rem; padding-bottom: 0.5rem; }
+        #hud-status { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        
+        #terminal { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        #content { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; margin-bottom: 1rem; }
+        
+        #choices { display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px dashed #004400; padding-top: 1rem; }
+        .choice-button { cursor: pointer; padding: 5px; border: 1px solid transparent; }
+        .choice-button:hover { background: #0f0; color: #000; font-weight: bold; }
+        
+        .back-link { margin-top: 1rem; color: #004400; text-decoration: none; text-align: center; }
+        .back-link:hover { color: #0f0; }
+    </style>
 </head>
 <body>
     <div id="game-container">
-        <!-- 3D Viewport (Top 40%) -->
-        <div id="viewport"></div>
-
-        <!-- Terminal Interface (Bottom 60%) -->
+        <div id="hud-bar"></div>
         <div id="terminal">
-            <div id="hud-bar">
-                <div id="hud-status">
-                    <span class="hud-party">
-                        <!-- Populated by JS -->
-                    </span>
-                    <span class="hud-resources">Initialize...</span>
-                </div>
-                <div class="hud-credits">$0</div>
-            </div>
-
-            <div id="content">
-                <!-- Game text content goes here -->
-            </div>
-
-            <div id="choices">
-                <!-- Choice buttons go here -->
-            </div>
-
-            <div id="input-line">
-                <span id="prompt">></span>
-                <input type="text" id="text-input" autocomplete="off" spellcheck="false" autofocus>
-            </div>
+            <div id="content"></div>
+            <div id="choices"></div>
         </div>
+        <a href="/" class="back-link">[<< RETURN TO ROOT]</a>
     </div>
 
-    <!-- Scanline effects -->
-    <div class="scanlines"></div>
-    <div class="static-noise"></div>
-
-    <!-- Back to Main Site -->
-    <a href="/" class="back-link">[<< RETURN TO ROOT]</a>
-
-    <!-- Initialize Module System -->
     <script type="module" src="src/main.js"></script>
 </body>
 </html>
